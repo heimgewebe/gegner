@@ -1,0 +1,23 @@
+[Unit]
+Description=Gegner same-thread countercheck MCP
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/repos/gegner
+ExecStart=%h/repos/gegner/.venv/bin/python %h/repos/gegner/server.py --transport streamable-http --host 127.0.0.1 --port 18188
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+
+[Install]
+WantedBy=default.target

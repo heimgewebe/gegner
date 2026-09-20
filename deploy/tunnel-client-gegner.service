@@ -1,0 +1,28 @@
+[Unit]
+Description=Gegner MCP Tunnel
+After=network-online.target gegner-mcp.service
+Wants=network-online.target gegner-mcp.service
+PartOf=gegner-mcp.service
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/tunnel-client/gegner-runtime.env
+WorkingDirectory=%h
+ExecStartPre=/usr/bin/curl --fail --silent --show-error --retry 30 --retry-delay 1 --retry-connrefused --connect-timeout 1 http://127.0.0.1:18188/healthz
+ExecStart=%h/.local/bin/tunnel-client run --profile gegner
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=60
+TimeoutStopSec=20
+KillMode=mixed
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=default.target
