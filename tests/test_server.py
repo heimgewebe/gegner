@@ -14,6 +14,7 @@ EXPECTED = {
     "path_lock": "path_dependence_and_sunk_cost",
     "convenient_result": "alternative_explanation_and_confirmation_bias",
     "manual": "necessary_assumption_inversion",
+    "dialectic": "independent_antithesis_then_evidence_based_decision",
 }
 
 
@@ -94,3 +95,68 @@ def test_instructions_do_not_demand_contrarian_theater() -> None:
     assert "not a second model" in lowered
     assert "continue" in lowered
     assert "must find an error" not in lowered
+
+
+def test_dialectic_defends_an_independent_antithesis_before_comparison() -> None:
+    result = server.build_countercheck(trigger="dialectic", current_claim="Keep path A")
+    instruction = result["instruction"]
+    assert instruction.index("A / THESIS") < instruction.index("B / ANTITHESIS")
+    assert instruction.index("B / ANTITHESIS") < instruction.index("C / DECISION")
+    assert "independently framed rival understanding" in instruction
+    assert "advocate" in instruction
+    assert "Do not merely list faults" in instruction
+    assert "preemptively dismiss" in instruction
+    assert result["required_return"] == [
+        "thesis", "antithesis", "comparison", "disposition"
+    ]
+
+
+def test_dialectic_is_pragmatic_evidence_based_and_not_forced_to_change() -> None:
+    instruction = server.TRIGGERS["dialectic"]["instruction"]
+    for required in (
+        "original user goal", "primary evidence", "future effort",
+        "complexity", "maintenance", "risk", "switching costs",
+        "ignore sunk effort", "existing simpler solution",
+        "change course, or stop", "own serious disadvantages",
+        "do not force contradiction or compromise",
+        "smallest discriminating test",
+    ):
+        assert required.lower() in instruction.lower()
+    result = server.build_countercheck(trigger="dialectic", current_claim="Claim")
+    assert result["allowed_dispositions"] == [
+        "CONTINUE", "CHANGE", "TEST", "PARK/STOP"
+    ]
+    assert result["automatic_effect"] is False
+    assert result["same_thread_same_model"] is True
+
+
+@pytest.mark.parametrize(
+    ("claim", "action"),
+    [
+        ("Custom retrieval service is necessary", "Replace existing retrieval"),
+        ("Extra access controls are legally required", "Keep scoped isolation"),
+        ("Six sequential patch attempts still fail", "Keep patching"),
+        ("Renderer is failing because of its code", "Rewrite renderer"),
+    ],
+)
+def test_dialectic_examples_do_not_fabricate_case_specific_evidence(
+    claim: str, action: str
+) -> None:
+    result = server.build_countercheck(
+        trigger="dialectic", current_claim=claim, planned_action=action
+    )
+    assert result["claim_sha256"] == hashlib.sha256(claim.encode()).hexdigest()
+    assert result["planned_action_sha256"] == hashlib.sha256(action.encode()).hexdigest()
+    assert result["instruction"] == server.TRIGGERS["dialectic"]["instruction"]
+    assert "external_evidence" in result["does_not_establish"]
+
+
+def test_existing_required_return_contract_remains_unchanged() -> None:
+    for trigger in EXPECTED:
+        if trigger == "dialectic":
+            continue
+        result = server.build_countercheck(trigger=trigger, current_claim="Claim")
+        assert result["required_return"] == [
+            "strongest_countercase", "fragile_assumption",
+            "discriminating_evidence", "disposition",
+        ]
