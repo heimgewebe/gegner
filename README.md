@@ -22,6 +22,7 @@ Supported triggers:
 - `path_lock` — path dependence + sunk-cost reset
 - `convenient_result` — alternative explanation + confirmation bias
 - `manual` — invert the strongest necessary assumption
+- `dialectic` — independently develop and defend a rival thesis, then compare both
 
 After the tool returns, ChatGPT should produce:
 
@@ -30,7 +31,19 @@ After the tool returns, ChatGPT should produce:
 3. discriminating evidence / cheapest useful test;
 4. one disposition: `CONTINUE`, `CHANGE`, `TEST`, or `PARK/STOP`.
 
+For `dialectic`, the required return is `thesis`, `antithesis`, `comparison`,
+and `disposition`, in that order. First identify the original goal and established state.
+Next advocate a plausible rival problem framing or action strategy on its own terms,
+including its supporting evidence and real weaknesses; do not immediately rebut it.
+Only then compare approaches against the original goal, evidence, future cost, risk
+and maintenance. In long-running work, ask whether the same path would be chosen
+from today's state. Simplification, continuation, testing, change and stopping are
+legitimate outcomes; no contrived dispute or compulsory synthesis is required.
+
 A legitimate result is `CONTINUE` when no material countercase survives the available evidence.
+
+The instruction contract is testable; whether the same model follows it reliably or
+reduces confirmation bias is **not** established by deterministic unit tests.
 
 ## Non-claims
 

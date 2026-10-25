@@ -41,6 +41,7 @@ Trigger = Literal[
     "path_lock",
     "convenient_result",
     "manual",
+    "dialectic",
 ]
 
 TRIGGERS: dict[str, dict[str, str]] = {
@@ -80,6 +81,27 @@ TRIGGERS: dict[str, dict[str, str]] = {
             "Assume the convenient result has another plausible explanation. Construct the strongest "
             "alternative explanation and name the observation that would distinguish it from the "
             "current interpretation."
+        ),
+    },
+    "dialectic": {
+        "lens": "independent_antithesis_then_evidence_based_decision",
+        "instruction": (
+            "A / THESIS: State the original user goal, the current thesis, its assumptions, "
+            "and what the available evidence actually establishes. "
+            "B / ANTITHESIS: Before defending or evaluating the thesis, formulate and "
+            "advocate the strongest plausible, independently framed rival understanding "
+            "and course of action on its own terms. It may redefine the problem, use an "
+            "existing simpler solution, reduce scope, change course, or stop. Explain "
+            "why it could better meet the original goal, its supporting evidence or "
+            "testable predictions, and its own serious disadvantages. Do not merely "
+            "list faults in the thesis, invent a rival, or preemptively dismiss it. "
+            "C / DECISION: Only now compare both positions by the original user goal, "
+            "current primary evidence, future effort, complexity, maintenance, risk, "
+            "alternatives, and real switching costs; ignore sunk effort. During ongoing "
+            "work ask whether today's knowledge would justify choosing the same path. "
+            "Choose CONTINUE, CHANGE, TEST or PARK/STOP; do not force contradiction or "
+            "compromise. State a concrete next action and, if the decision hinges "
+            "on missing evidence, the smallest discriminating test."
         ),
     },
     "manual": {
@@ -143,7 +165,11 @@ def build_countercheck(
         "planned_action_sha256": _sha256_text(action) if action is not None else None,
         "lens": lens["lens"],
         "instruction": lens["instruction"],
-        "required_return": list(REQUIRED_RETURN),
+        "required_return": (
+            ["thesis", "antithesis", "comparison", "disposition"]
+            if trigger == "dialectic"
+            else list(REQUIRED_RETURN)
+        ),
         "allowed_dispositions": list(ALLOWED_DISPOSITIONS),
         "automatic_effect": False,
         "same_thread_same_model": True,
