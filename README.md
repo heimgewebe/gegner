@@ -59,6 +59,16 @@ The public deployment examples use:
 
 Live tunnel identifiers and credentials belong only in the private local tunnel-client profile.
 
+On both NixOS and traditional Linux, the tunnel service resolves the readiness
+probe using the fixed system-only PATH (`/run/current-system/sw/bin:/usr/bin:/bin`).
+This avoids assuming that `/usr/bin/curl` exists on NixOS without adding
+user-writable command directories. It still expects a previously installed
+`%h/.local/bin/tunnel-client` and a real, pre-existing private `gegner`
+tunnel profile and credential environment file. It deliberately never creates
+an OpenAI tunnel, chooses a new ID, or copies secrets into Git. Missing live
+registration is a blocking prerequisite, not a reason to guess identifiers.
+Local MCP health checks do not establish the externally registered ChatGPT link.
+
 ## Development
 
 ```bash

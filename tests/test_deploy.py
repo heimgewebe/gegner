@@ -19,6 +19,12 @@ def test_tunnel_service_uses_existing_tunnel_client_and_profile() -> None:
     assert "tunnel-client run --profile gegner" in unit
     assert "http://127.0.0.1:18188/healthz" in unit
     assert "EnvironmentFile=%h/.config/tunnel-client/gegner-runtime.env" in unit
+    assert "Environment=PATH=/run/current-system/sw/bin:/usr/bin:/bin" in unit
+    assert "ExecStartPre=/usr/bin/env curl " in unit
+    assert "/usr/bin/curl " not in unit
+    assert "ExecStart=%h/.local/bin/tunnel-client run --profile gegner" in unit
+    assert "ProtectSystem=strict" in unit
+    assert "ProtectHome=read-only" in unit
 
 
 def test_public_tunnel_example_contains_no_live_identifiers() -> None:
