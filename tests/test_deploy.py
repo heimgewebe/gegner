@@ -19,6 +19,12 @@ def test_tunnel_service_uses_existing_tunnel_client_and_profile() -> None:
     assert "tunnel-client run --profile gegner" in unit
     assert "http://127.0.0.1:18188/healthz" in unit
     assert "EnvironmentFile=%h/.config/tunnel-client/gegner-runtime.env" in unit
+    assert "ExecStartPre=/usr/bin/env -i PATH=/run/current-system/sw/bin:/usr/bin:/bin curl " in unit
+    assert "Environment=PATH=" not in unit
+    assert "/usr/bin/curl " not in unit
+    assert "ExecStart=%h/.local/bin/tunnel-client run --profile gegner" in unit
+    assert "ProtectSystem=strict" in unit
+    assert "ProtectHome=read-only" in unit
 
 
 def test_public_tunnel_example_contains_no_live_identifiers() -> None:
@@ -27,3 +33,28 @@ def test_public_tunnel_example_contains_no_live_identifiers() -> None:
     assert 'OpenAI-Organization: "org_REPLACE_ME"' in profile
     assert "18188/mcp" in profile
     assert "127.0.0.1:18088" in profile
+
+
+def test_readiness_preflight_discards_private_environment_and_overridden_path() -> None:
+    import shlex
+    import subprocess
+
+    unit = (ROOT / "deploy" / "tunnel-client-gegner.service").read_text(encoding="utf-8")
+    command_line = next(line for line in unit.splitlines() if line.startswith("ExecStartPre="))
+    argv = shlex.split(command_line.split("=", 1)[1])
+    assert argv[:3] == [
+        "/usr/bin/env", "-i", "PATH=/run/current-system/sw/bin:/usr/bin:/bin"
+    ]
+    proof = subprocess.run(
+        [*argv[:3], "/usr/bin/env"],
+        env={
+            "CONTROL_PLANE_API_KEY": "synthetic-test-secret",
+            "PATH": "/home/user/bin",
+        },
+        text=True,
+        capture_output=True,
+        check=True,
+        timeout=10,
+    )
+    assert proof.stdout.strip() == argv[2]
+    assert "CONTROL_PLANE_API_KEY" not in proof.stdout

@@ -8,7 +8,7 @@ PartOf=gegner-mcp.service
 Type=simple
 EnvironmentFile=%h/.config/tunnel-client/gegner-runtime.env
 WorkingDirectory=%h
-ExecStartPre=/usr/bin/curl --fail --silent --show-error --retry 30 --retry-delay 1 --retry-connrefused --connect-timeout 1 http://127.0.0.1:18188/healthz
+ExecStartPre=/usr/bin/env -i PATH=/run/current-system/sw/bin:/usr/bin:/bin curl --fail --silent --show-error --retry 30 --retry-delay 1 --retry-connrefused --connect-timeout 1 http://127.0.0.1:18188/healthz
 ExecStart=%h/.local/bin/tunnel-client run --profile gegner
 Restart=on-failure
 RestartSec=5
