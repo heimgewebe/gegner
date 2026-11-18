@@ -160,3 +160,34 @@ def test_existing_required_return_contract_remains_unchanged() -> None:
             "strongest_countercase", "fragile_assumption",
             "discriminating_evidence", "disposition",
         ]
+
+
+def test_tool_description_guides_proactive_use_without_an_approval_gate() -> None:
+    description = inspect.getdoc(server.gegenprobe)
+    assert description is not None
+    registered = server.mcp._tool_manager.get_tool("gegenprobe")
+    assert "Call proactively before" in registered.description
+    for phrase in (
+        "Call proactively before",
+        "architecture or strategy",
+        "repeated",
+        "production closeout",
+        "BEFORE writing the rival",
+        "smallest discriminating observation",
+        "not an independent reviewer or an approval gate",
+    ):
+        assert phrase in description
+
+
+def test_countercheck_guidance_requests_new_rival_without_forcing_novelty() -> None:
+    instructions = server.INSTRUCTIONS
+    assert "Proactively call gegenprobe" in instructions
+    assert "never block necessary work" in instructions
+    assert "not an already\nwritten rival solution" in instructions
+    dialectic = server.build_countercheck(trigger="dialectic", current_claim="Keep A")
+    prompt = dialectic["instruction"]
+    assert "not already proposed in the current claim or planned action" in prompt
+    assert "when one exists" in prompt
+    assert "never invent novelty or force disagreement" in prompt
+    assert dialectic["same_thread_same_model"] is True
+    assert dialectic["automatic_effect"] is False
