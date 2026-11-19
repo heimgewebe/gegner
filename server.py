@@ -19,10 +19,15 @@ MAX_TEXT_BYTES = 8_192
 
 INSTRUCTIONS = """You are Gegner, a minimal same-thread countercheck interrupt for ChatGPT.
 You are not a second model, reviewer, observer, evidence source, or authority.
-Your only tool deterministically returns a countercheck lens for the current claim.
-The same ChatGPT instance in the same thread must perform the actual counterargument after the tool returns.
+Proactively call gegenprobe before consequential architecture or strategy choices, after repeated
+unsuccessful repairs, or before a doubtful production closeout. Prefer one timely call per
+material decision, not routine calls or a new approval gate. If unavailable, continue with
+an ordinary critical examination; never block necessary work solely on this tool.
+Before calling, formulate the current provisional claim and intended action, not an already
+written rival solution. Your only tool deterministically returns a countercheck lens; the
+same ChatGPT in the same thread must construct and assess the counterargument afterward.
 Do not imply independent cognition, correctness, external evidence, or permission to act.
-A countercheck may legitimately end in CONTINUE when no material countercase survives the available evidence."""
+A countercheck may legitimately end in CONTINUE when no material countercase survives."""
 
 mcp = FastMCP(APP_NAME, instructions=INSTRUCTIONS)
 
@@ -95,6 +100,10 @@ TRIGGERS: dict[str, dict[str, str]] = {
             "why it could better meet the original goal, its supporting evidence or "
             "testable predictions, and its own serious disadvantages. Do not merely "
             "list faults in the thesis, invent a rival, or preemptively dismiss it. "
+            "Look for a materially different, plausible rival not already proposed in the "
+            "current claim or planned action. If the input already suggests a rival, treat "
+            "it as known and test another meaningful direction when one exists; never invent "
+            "novelty or force disagreement when none is credible. "
             "C / DECISION: Only now compare both positions by the original user goal, "
             "current primary evidence, future effort, complexity, maintenance, risk, "
             "alternatives, and real switching costs; ignore sunk effort. During ongoing "
@@ -183,7 +192,18 @@ def gegenprobe(
     current_claim: str,
     planned_action: str | None = None,
 ) -> dict[str, Any]:
-    """Return one deterministic lens that ChatGPT must apply to its own current claim."""
+    """Interrupt an important decision early with a same-model countercheck.
+
+    Call proactively before a nontrivial architecture or strategy commitment, after repeated
+    unsuccessful repairs, when a result is suspiciously convenient, or before an uncertain
+    production closeout. Choose architecture, commitment, path_lock, convenient_result,
+    closeout, or dialectic to fit the situation; manual is a generic fallback.
+    Give your provisional current_claim and actual planned_action BEFORE writing the rival
+    argument; do not pre-seed the alternative. After the call, construct and compare a
+    plausible countercase and identify the smallest discriminating observation.
+    Use at most one call per material decision unless new evidence changes the decision.
+    This is not an independent reviewer or an approval gate; keep working if unavailable.
+    """
     return build_countercheck(
         trigger=trigger,
         current_claim=current_claim,

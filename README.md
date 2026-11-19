@@ -14,6 +14,18 @@ Exactly one MCP tool is exposed:
 The tool does not generate the counterargument. It deterministically chooses a countercheck
 lens and returns an instruction that the same ChatGPT instance must apply after the tool call.
 
+Use proactively **before** consequential architecture or strategy choices, after repeated
+unsuccessful repairs, on suspiciously convenient results, or before an uncertain production
+closeout. Select the most relevant trigger; one countercheck per material decision normally
+suffices. Routine actions need none. A missing tool must never become an approval gate.
+
+Provide your genuine provisional `current_claim` and the intended `planned_action` **before**
+writing a counterargument. Do not include a prepared antithesis in those arguments: the same
+ChatGPT model should independently develop a credible rival after the call. If the input
+already contains an alternative, test a genuinely different option **when one is plausible**;
+do not manufacture novelty or forced contradiction. Identify the smallest observation that
+could actually change the decision, and verify facts against primary sources.
+
 Supported triggers:
 
 - `architecture` — goal mismatch + simpler alternative
